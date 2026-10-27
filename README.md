@@ -18,3 +18,7 @@ A page loads it with one script tag, at a pinned version:
 `both`.
 
 Test: `bun install`, then `bun run test` (a real mouse on the board, through the Chrome installed on the machine).
+
+## License
+
+Apache License 2.0 ([LICENSE](LICENSE)). Work built on this code keeps the [NOTICE](NOTICE) with it.
