@@ -11,8 +11,10 @@ A page loads it with one script tag, at a pinned version:
 
 ```html
 <script>window.PREFS = { lock: false, shape: "rect", line: "arrow" };</script>
-<script src="https://cdn.jsdelivr.net/gh/lossless-hq/lossless-kit@v0.1.0/pad/board.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/lossless-hq/lossless-kit@v0.1.1/pad/board.js"></script>
 ```
 
 `PREFS`: `lock` keeps a tool on after one use; `shape` is `rect`, `ellipse` or `diamond`; `line` is `arrow`, `line` or
 `both`.
+
+Test: `bun install`, then `bun run test` (a real mouse on the board, through the Chrome installed on the machine).

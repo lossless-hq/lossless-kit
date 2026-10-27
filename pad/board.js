@@ -46,6 +46,8 @@ style.textContent = `
     border: 1px solid var(--ring); border-radius: 4px; padding: 2px 4px; min-width: 120px; }
   pre { font: 12px/1.5 var(--font-mono); background: var(--code-background); padding: 12px 16px;
     border-radius: var(--radius); white-space: pre-wrap; margin: 8px 0 0; display: none; }
+  .board, .hint { -webkit-user-select: none; user-select: none; }
+  .board input { -webkit-user-select: text; user-select: text; }
   .hint { font-size: 12px; color: var(--muted-foreground); margin-top: 6px; min-height: 16px; }
 `;
 document.head.appendChild(style);
@@ -348,7 +350,7 @@ const at = (x, y) => { const hits = items.filter(it => hit(it, x, y, true));
 cv.addEventListener("pointerdown", e => {
   closeMenus();
   const [x, y] = pos(e);
-  if (tool === "text") return placeText(x, y);
+  if (tool === "text") { e.preventDefault(); const it = at(x, y); return it && it.t === "text" ? placeText(it.x, it.y, it) : placeText(x, y); }
   cv.setPointerCapture(e.pointerId);
   if (tool === "eraser") { drag = { erase: snap() }; erase(x, y); return; }
   if (tool === "select") {
@@ -410,7 +412,9 @@ function placeText(x, y, editing) {
   inp.dir = "auto"; inp.style.left = (x - 5) + "px"; inp.style.top = (y - 4) + "px";
   if (editing) inp.value = editing.s;
   inp.style.fontSize = (editing ? editing.z || 15 : textSize) + "px";
-  board.appendChild(inp); setTimeout(() => { inp.focus(); inp.select(); }, 0);
+  board.appendChild(inp);
+  const caret = () => { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); };
+  caret(); setTimeout(caret, 0);
   let closed = false;
   const done = keep => {
     if (closed) return; closed = true; const s = inp.value.trim(), before = snap();

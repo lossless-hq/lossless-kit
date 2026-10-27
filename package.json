@@ -1,0 +1,7 @@
+{
+  "name": "lossless-kit",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "bun pad/test/clicks.ts" },
+  "devDependencies": { "playwright-core": "^1.64.1" }
+}
