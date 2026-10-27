@@ -484,6 +484,9 @@ document.getElementById("send").onclick = () => {
   const out = document.getElementById("out"); out.style.display = "block";
   out.textContent = "What goes to the conversation, beside the image:\n\n" + describe();
   window.parent.postMessage({ jsonrpc: "2.0", method: "ui/notifications/size-changed", params: { height: document.documentElement.scrollHeight } }, "*");
+  // To the conversation as the person's message, where the host takes it (MCP Apps' ui/message); else it stays printed.
+  window.parent.postMessage({ jsonrpc: "2.0", id: "pad-send-" + Date.now(), method: "ui/message",
+    params: { role: "user", content: [{ type: "text", text: "From the pad board:\n\n" + describe() }] } }, "*");
 };
 
 })();
