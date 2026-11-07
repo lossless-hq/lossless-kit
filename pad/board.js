@@ -246,9 +246,9 @@ function drawItem(it) {
     ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(it.x1, it.y1); ctx.lineTo(it.x2, it.y2); ctx.stroke();
     if (it.k !== "line") arrowHead(it.x1, it.y1, it.x2, it.y2);
     if (it.k === "both") arrowHead(it.x2, it.y2, it.x1, it.y1);
-    // An open end shows as a hollow ring, so what is unconnected is visible before it is sent.
-    if (it !== cur) [[it.a, it.x1, it.y1], [it.b, it.x2, it.y2]].forEach(([id, x, y]) => { if (!id) {
-      ctx.save(); ctx.lineWidth = 1.5; ctx.fillStyle = css("var(--card)"); ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore(); } });
+    // A bound end carries a dot; an end without one is open, so what is connected is visible before it is sent.
+    [[it.a, it.x1, it.y1], [it.b, it.x2, it.y2]].forEach(([id, x, y]) => { if (!id) return;
+      ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill(); });
   } else if (it.t === "text") {
     ctx.font = font(it); ctx.textBaseline = "top"; ctx.direction = rtl(it.s) ? "rtl" : "ltr"; ctx.textAlign = "left";
     ctx.fillText(it.s, it.x, it.y);
