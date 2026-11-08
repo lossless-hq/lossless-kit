@@ -45,8 +45,8 @@ flowchart LR
   A[output<br/>pptx · docx · PDF · image] -->|LibreOffice| B[PDF]
   B -->|PyMuPDF, a page each| C[PNG per page]
   C -->|imgslim| D[slim pages]
-  D -->|pages.py| E[review.html<br/>one file, viewer inside]
-  E -->|the host's own web view| F[the user marks, Send]
+  D -->|pages.py| E[review.html<br/>one file, the pages]
+  E -->|the host's own web view| F[the user marks<br/>the host's tool, or the viewer]
   F -->|marks in the conversation| G[the agent fixes the source]
   G -->|rebuild, pages.py again| A
 ```
@@ -58,10 +58,10 @@ skills/visual-review/
   SKILL.md           the steps
   agents/openai.yaml
   scripts/pages.py   the whole chain, from the file to review.html
-  scripts/viewer.js  the marking layer, inlined into review.html
+  scripts/viewer.js  a marking layer for a host without one, inlined by pages.py --marks
 ```
 
-The page is one file with its images and viewer inside, so it opens the same in any host and needs no internet. The
+The page is one file with its images inside, so it opens the same in any host and needs no internet. The
 output is never edited through the pages: a fix lands in whatever builds the output, and the next run starts from an
 empty folder. A missing tool stops `pages.py` with the tool named; the skill asks before installing it.
 

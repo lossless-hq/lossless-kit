@@ -8,8 +8,9 @@ disable-model-invocation: true
 The output is the person's own, made elsewhere. Show it the way its reader will see it, as pages the person marks, and
 fix what they mark at its source. The page you show is a view: the fix lands in whatever builds the output.
 
-`scripts/pages.py` does the whole chain: file, PDF, one image per page, `imgslim`, one self-contained `review.html` with
-the viewer (`scripts/viewer.js`) inside. It needs LibreOffice for decks and documents, PyMuPDF (or `pdftoppm`) for PDFs,
+`scripts/pages.py` does the whole chain: file, PDF, one image per page, `imgslim`, one self-contained `review.html`. The
+person marks with the host's own marking tool when it has one; `--marks` adds the viewer (`scripts/viewer.js`), a
+marking layer inside the page, for a host without. It needs LibreOffice for decks and documents, PyMuPDF (or `pdftoppm`) for PDFs,
 and `imgslim` when the machine has it.
 
 ## 1. Find the output
@@ -21,7 +22,7 @@ Done when the file's path and its builder, if any, are settled.
 
 ## 2. Make the page
 
-Run `scripts/pages.py <file> --title "<name>"`. The output folder empties itself on every run, so one round is one
+Run `scripts/pages.py <file> --title "<name>"`, with `--marks` when the host cannot mark on a page (step 3). The output folder empties itself on every run, so one round is one
 command.
 
 Done when it prints the page's path and a page count equal to the output's. A missing tool stops it with the tool named:
@@ -32,20 +33,20 @@ ask the person, install after their yes, run again.
 Open `review.html` in the host's own web view; the page is one file that needs no internet.
 
 - **T3:** serve its folder on `127.0.0.1` from a free port (`python3 -m http.server <port> --bind 127.0.0.1`, in the
-  background) and open the address in the preview tab at its current size.
+  background) and open the address in the preview tab at its current size. The tab's Annotate marks regions and drawings.
 - **Claude desktop and other hosts:** the host's own browser or artifact pane.
 - **No pane:** give the absolute path for the person to open.
 
-The viewer carries its own marking, so a host's annotate tool is optional. Tell the person, in one line: drag on a page
-to mark, type, press **Send**.
+The host marks pages itself when it has an annotate tool: show the plain page. Without one, run step 2 again with
+`--marks` and tell the person, in one line: drag on a page to mark, type, press **Send**.
 
-Done when the person sees the pages.
+Done when the person sees the pages and has a way to mark them.
 
 ## 4. Read the marks
 
-**Send** prints the marks under the pages: each one a page, a place on it, the person's words. Where the host takes a
-page's `ui/message` (T3, through the fork), they arrive as the person's next message headed "From the review viewer";
-elsewhere the person pastes them.
+Marks made with the host's tool arrive with the person's message. Marks made in the viewer are printed under the pages by
+**Send**, each one a page, a place on it, the person's words; where the host takes a page's `ui/message` they arrive as
+the person's next message headed "From the review viewer", otherwise read them off the page or have the person paste them.
 
 A mark is a place and a question. Ask about a reading that splits two ways, one question at a time, and treat marks that
 say the same thing as one problem with one cause.

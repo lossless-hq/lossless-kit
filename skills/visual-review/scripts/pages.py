@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """A finished output -> one self-contained review.html: pages as images, with the viewer inside.
 
-usage: pages.py INPUT [--out DIR] [--title TITLE] [--dpi 160]
+usage: pages.py INPUT [--out DIR] [--title TITLE] [--dpi 160] [--marks]
 
 INPUT is a deck or document (pptx, docx, odp, odt), a PDF, or an image. DIR starts empty on every run, so no page of an
-earlier round stays behind. Prints the path of the page. Exit 2 with the missing tools named when a dependency is absent.
+earlier round stays behind. The page is plain pages by default, for a host that lets the person mark on a page itself;
+--marks adds the viewer, a marking layer inside the page, for a host that does not. Prints the path of the page. Exit 2 with the missing tools named when a dependency is absent.
 """
 import argparse, base64, json, mimetypes, os, shutil, subprocess, sys, tempfile
 from pathlib import Path
@@ -65,7 +66,7 @@ def data_uri(path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("input"); ap.add_argument("--out"); ap.add_argument("--title"); ap.add_argument("--dpi", type=int, default=160)
+    ap.add_argument("input"); ap.add_argument("--out"); ap.add_argument("--title"); ap.add_argument("--dpi", type=int, default=160); ap.add_argument("--marks", action="store_true")
     a = ap.parse_args()
     src = Path(a.input).expanduser().resolve()
     if not src.exists():
@@ -82,11 +83,17 @@ def main():
     else:
         sys.exit("a file of type " + ext + " is not handled: turn it into a PDF or an image first")
 
-    viewer = (HERE / "viewer.js").read_text(encoding="utf-8").replace("</script", "<\\/script")
     review = {"title": a.title or src.stem, "pages": [{"src": data_uri(slim(p)), "name": ""} for p in pages]}
-    html = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>' + review["title"] + '</title></head><body>\n'
-            "<script>window.REVIEW = " + json.dumps(review).replace("</", "<\\/") + ";</script>\n"
-            "<script>" + viewer + "</script>\n</body></html>")
+    head = '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>' + review["title"] + '</title></head><body>\n'
+    if a.marks:
+        viewer = (HERE / "viewer.js").read_text(encoding="utf-8").replace("</script", "<\\/script")
+        html = (head + "<script>window.REVIEW = " + json.dumps(review).replace("</", "<\\/") + ";</script>\n"
+                "<script>" + viewer + "</script>\n</body></html>")
+    else:
+        figs = "".join(f'<figure><figcaption>{i}</figcaption><img src="{p["src"]}"></figure>' for i, p in enumerate(review["pages"], 1))
+        html = (head + "<style>body{margin:0;padding:16px;background:#e9edf3;font:14px sans-serif}figure{margin:0 auto 18px;max-width:960px}"
+                "figcaption{color:#667;margin-bottom:4px}img{width:100%;display:block;border:1px solid #c8d0dc;background:#fff}</style>"
+                + figs + "</body></html>")
     (out / "review.html").write_text(html, encoding="utf-8")
     print(out / "review.html", f"({len(pages)} pages)")
 
