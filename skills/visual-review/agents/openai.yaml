@@ -1,0 +1,7 @@
+interface:
+  display_name: "Visual review"
+  short_description: "Go over a finished output by eye, marking on its pages"
+  default_prompt: "Use $visual-review to open this file as pages I can mark, and fix what I mark at its source."
+
+policy:
+  allow_implicit_invocation: false
