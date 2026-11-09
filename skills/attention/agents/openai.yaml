@@ -1,0 +1,5 @@
+interface:
+  display_name: "Attention"
+  short_description: "Pick up from the handoff, or hand this session off"
+policy:
+  allow_implicit_invocation: false

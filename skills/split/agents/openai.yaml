@@ -1,0 +1,5 @@
+interface:
+  display_name: "Split"
+  short_description: "Open a child conversation or a subagent from this conversation"
+policy:
+  allow_implicit_invocation: false

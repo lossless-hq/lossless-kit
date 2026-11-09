@@ -14,6 +14,7 @@ What lossless hands out: skills, a plugin for T3 Code, and the code they load.
 | `merge-branch` | merge a unit of work into its base: check nothing is left behind, rebase, test, open a PR |
 | `visual-it` | create or redesign a self-contained single-file HTML artifact with a visual direction shaped by the brief |
 | `visual-review` | go over a finished output (deck, PDF, image, ad, message) with the user by eye, marking on its pages until nothing is unclear |
+| `freestyle` | talk a subject out in recordings; the agent keeps your words verbatim and builds a shared understanding of it |
 | `readable` | readable names for files, folders and archives, each carrying a short, clear meaning of what it is |
 
 ## pad

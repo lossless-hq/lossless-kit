@@ -1,0 +1,5 @@
+interface:
+  display_name: "Merge branch"
+  short_description: "Check, rebase, test and open a PR for this unit of work"
+policy:
+  allow_implicit_invocation: false
