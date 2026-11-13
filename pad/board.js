@@ -136,6 +136,11 @@ function restoreDrawing() {
   try { const s = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || "null"); if (s && Array.isArray(s.items) && Date.now() - s.at < KEEP_MS) items = s.items; } catch {}
 }
 restoreDrawing();
+// The enlarged view is a second copy of this board. When it saves, this copy takes the drawing over, so closing it leaves the work here.
+window.addEventListener("storage", e => {
+  if (e.key !== AUTOSAVE_KEY || !e.newValue) return;
+  try { const s = JSON.parse(e.newValue); if (Array.isArray(s.items)) { items = s.items; sel = null; draw(); } } catch {}
+});
 const newId = () => Math.random().toString(36).slice(2, 9);
 const SIZES = [11, 13, 15, 18, 22, 28, 36];
 
@@ -488,9 +493,17 @@ function describe() {
   if (pens) lines.push("Freehand pen strokes: " + pens + " (in the image)");
   return lines.join("\n") || "(the board is empty)";
 }
+// A host may not take ui/message from where the board is shown (the enlarged view): the same text is also copied, to paste into the chat.
+function copyText(text) {
+  const fallback = () => { const t = document.createElement("textarea"); t.value = text; t.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(t); t.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); return ok; };
+  try { if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).then(() => true, () => fallback()); } catch {}
+  return Promise.resolve(fallback());
+}
 document.getElementById("send").onclick = () => {
   const out = document.getElementById("out"); out.style.display = "block";
   out.textContent = "What goes to the conversation, beside the image:\n\n" + describe();
+  copyText("From the pad board:\n\n" + describe()).then(ok => { if (ok) out.textContent += "\n\n(Copied. If it did not arrive in the chat by itself, paste it there.)"; });
   window.parent.postMessage({ jsonrpc: "2.0", method: "ui/notifications/size-changed", params: { height: document.documentElement.scrollHeight } }, "*");
   // To the conversation as the person's message, where the host takes it (MCP Apps' ui/message); else it stays printed.
   window.parent.postMessage({ jsonrpc: "2.0", id: "pad-send-" + Date.now(), method: "ui/message",
