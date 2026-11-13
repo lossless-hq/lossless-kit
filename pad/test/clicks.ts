@@ -13,6 +13,7 @@ const browser = await chromium.launch({ channel: 'chrome' })
 let red = 0
 async function scenario(name: string, steps: (p: any, c: { x: number; y: number }) => Promise<void>, expect: { selection?: boolean; inputs?: number; value?: string; selected?: number; sends?: string }) {
   const p = await browser.newPage({ viewport: { width: 728, height: 620 } })
+  await p.addInitScript(() => { try { localStorage.clear() } catch {} }) // each scenario starts on an empty board, not on the last one's autosave
   await p.goto('file://' + page)
   const box = await p.locator('#c').boundingBox()
   await steps(p, { x: box.x, y: box.y })

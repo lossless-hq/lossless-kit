@@ -128,6 +128,14 @@ const board = document.getElementById("board"), cv = document.getElementById("c"
 let tool = "pen", color = 0, items = [], cur = null, drag = null, sel = null, lock = PREFS.lock;
 let shapeKind = PREFS.shape, lineKind = PREFS.line;
 let past = [], future = [], textSize = 15, hover = null;
+// The drawing survives a reload of the frame (a host that re-mounts the board, an enlarged view): it is saved after every change and
+// restored when it is younger than KEEP_MS. Clear empties it too. Storage can be blocked in a sandboxed frame: then the board works as before.
+const AUTOSAVE_KEY = "lossless-pad-autosave", KEEP_MS = 12 * 60 * 60 * 1000;
+function saveDrawing() { try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({ at: Date.now(), items })); } catch {} }
+function restoreDrawing() {
+  try { const s = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || "null"); if (s && Array.isArray(s.items) && Date.now() - s.at < KEEP_MS) items = s.items; } catch {}
+}
+restoreDrawing();
 const newId = () => Math.random().toString(36).slice(2, 9);
 const SIZES = [11, 13, 15, 18, 22, 28, 36];
 
@@ -139,7 +147,7 @@ const snap = () => JSON.stringify(items);
 function commit(before) { if (before === snap()) return; past.push(before); future = []; syncHistory(); }
 function doUndo() { if (!past.length) return; future.push(snap()); items = JSON.parse(past.pop()); sel = null; syncHistory(); draw(); }
 function doRedo() { if (!future.length) return; past.push(snap()); items = JSON.parse(future.pop()); sel = null; syncHistory(); draw(); }
-function syncHistory() { document.getElementById("undo").disabled = !past.length; document.getElementById("redo").disabled = !future.length; }
+function syncHistory() { document.getElementById("undo").disabled = !past.length; document.getElementById("redo").disabled = !future.length; saveDrawing(); }
 
 const colorsEl = document.getElementById("colors");
 COLORS.forEach((c, i) => {
